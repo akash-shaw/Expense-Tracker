@@ -1,3 +1,7 @@
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.text.NumberFormat;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -43,9 +47,43 @@ class Account {
     }
 }
 
+
+class Transaction {
+    private String type;
+    private double amount;
+    private String date;
+
+    public Transaction(String type, double amount) {
+        this.type = type;
+        this.amount = amount;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        this.date = LocalDateTime.now().format(formatter);
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s: %.2f on %s", type, amount, date);
+    }
+}
+
+
 public class ExpenseTracker extends Application {
     Account ac = new Account();
-    Label messageLabel = new Label();
+    List<Transaction> transactions = new ArrayList<>();
+
+    Label messageLabel = new Label("Message: NIL");
     Label balanceLabel = new Label("Balance = " + ac.getBalance());
 
     public void updateMessage(String message) {
@@ -93,14 +131,20 @@ public class ExpenseTracker extends Application {
         // Start of sc2
 
         Button mainPageBtn = new Button("Back to Main Page");
+        //TODO statement table
 
         VBox root2 = new VBox();
-        root2.getChildren().addAll(mainPageBtn);
+        VBox statements = new VBox();
+        statements.setSpacing(5);
+        root2.getChildren().addAll(mainPageBtn, statements);
 
         Scene sc2 = new Scene(root2, 500, 450);
 
 
-        statementBtn.setOnAction(e -> switchScene(st, sc2));
+        statementBtn.setOnAction(e -> {
+            updateStatementList(statements);
+            switchScene(st, sc2);
+        });
         mainPageBtn.setOnAction(e -> switchScene(st, sc1));
 
 
@@ -108,9 +152,16 @@ public class ExpenseTracker extends Application {
         st.show();
     }
 
+    private void updateStatementList(VBox root){
+        root.getChildren().clear();
+        for(Transaction t: transactions){
+            root.getChildren().add( new Label(t.toString()) );
+        }
+    }
+
     private void handleCredit(TextField amountTextField) {
         double enteredAmount;
-
+    
         try {
             enteredAmount = Double.parseDouble(amountTextField.getText());
             if (enteredAmount < 0) {
@@ -120,15 +171,17 @@ public class ExpenseTracker extends Application {
             updateMessage("Invalid Amount");
             return;
         }
-
+    
         ac.credit(enteredAmount);
         updateMessage(enteredAmount + " Credited Successfully");
         updateBalance();
+        transactions.add(new Transaction("Credit", enteredAmount)); // Add transaction
+        amountTextField.clear();
     }
-
+    
     private void handleDebit(TextField amountTextField) {
         double enteredAmount;
-
+    
         try {
             enteredAmount = Double.parseDouble(amountTextField.getText());
             if (enteredAmount < 0) {
@@ -138,14 +191,16 @@ public class ExpenseTracker extends Application {
             updateMessage("Invalid Amount");
             return;
         }
-
+    
         if (ac.debit(enteredAmount)) {
             updateMessage(enteredAmount + " Debited Successfully");
             updateBalance();
+            transactions.add(new Transaction("Debit", enteredAmount)); // Add transaction
+            amountTextField.clear();
         } else {
             updateMessage("Insufficient Balance");
         }
-    }
+    }    
 
     private void switchScene(Stage st, Scene sc){
         st.setScene(sc);
