@@ -10,6 +10,8 @@ import javafx.scene.Scene;
 import javafx.event.EventHandler;
 import javafx.event.ActionEvent;
 import javafx.scene.layout.GridPane;
+import javafx.geometry.Pos;
+import javafx.scene.layout.VBox;
 
 class Account{
     private double balance;
@@ -113,11 +115,22 @@ public class ExpenseTracker extends Application{
             }
         });
 
-        GridPane root = new GridPane();
-        root.addRow(0,amountLabel, amountTextField);
-        root.addRow(1,creditBtn,debitBtn);
-        root.addRow(2, messageLabel);
-        root.addRow(3, balanceLabel);
+        GridPane gp1 = new GridPane();
+        gp1.addRow(0,amountLabel, amountTextField,creditBtn,debitBtn);
+        gp1.setHgap(10);
+        // gp1.setAlignment(Pos.CENTER);
+        // gp1.setVgap(10);
+        
+        GridPane gp2 = new GridPane();        
+        gp2.addRow(0, messageLabel);
+
+        GridPane gp3 = new GridPane();
+        gp3.addRow(0, balanceLabel);
+
+        VBox root = new VBox();
+        root.getChildren().addAll(gp1,gp2,gp3);
+        root.setSpacing(10);
+
         Scene sc = new Scene(root, 500, 450);
         st.setScene(sc);
         st.show();
