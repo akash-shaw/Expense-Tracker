@@ -12,6 +12,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.Scene;
 import javafx.geometry.Pos;
 import javafx.scene.layout.VBox;
+import javafx.geometry.Insets;
+import java.util.Collections;
 
 class Account {
     private double balance;
@@ -80,8 +82,7 @@ class Transaction {
         return remarks;
     }
 
-    @Override
-    public String toString() {
+    public String getStatementString() {
         return String.format("%s: %.2f\t on %s,\tBalance: %.2f,\tRemarks: %s", type, amount, date, currentBalance, remarks);
     }
 }
@@ -105,8 +106,13 @@ public class ExpenseTracker extends Application {
     @Override
     public void start(Stage st) {
         st.setTitle("Expense Tracker");
+
+        Label headingSc1 = new Label("Expense Manager");
+        headingSc1.setStyle("-fx-font-weight: bold; -fx-font-size: 24px;");
+
         Label amountLabel = new Label("Enter amount:");
         TextField amountTextField = new TextField();
+
         Label remarksLabel = new Label("Remarks:");
         TextField remarksTextField = new TextField();
 
@@ -138,21 +144,25 @@ public class ExpenseTracker extends Application {
         gp5.addRow(0, statementBtn);
 
         VBox root1 = new VBox();
-        root1.getChildren().addAll(gp1, gp2, gp3, gp4, gp5);
+        root1.getChildren().addAll(headingSc1, gp1, gp2, gp3, gp4, gp5);
         root1.setSpacing(10);
+        root1.setPadding(new Insets(20));
 
         Scene sc1 = new Scene(root1, 500, 450);
 
 
         // Start of sc2
+        Label headingSc2 = new Label("Your Expenses");
+        headingSc2.setStyle("-fx-font-weight: bold; -fx-font-size: 24px;");
 
         Button mainPageBtn = new Button("Back to Main Page");
-        //TODO statement table
 
         VBox root2 = new VBox();
+        root2.setSpacing(10);
         VBox statements = new VBox();
         statements.setSpacing(5);
-        root2.getChildren().addAll(mainPageBtn, statements);
+        root2.getChildren().addAll(headingSc2, mainPageBtn, statements);
+        root2.setPadding(new Insets(20));
 
         Scene sc2 = new Scene(root2, 500, 450);
 
@@ -170,8 +180,9 @@ public class ExpenseTracker extends Application {
 
     private void updateStatementList(VBox root){
         root.getChildren().clear();
-        for(Transaction t: transactions){
-            root.getChildren().add( new Label(t.toString()) );
+        for (int i = transactions.size() - 1; i >= 0; i--) {
+            Transaction t = transactions.get(i);
+            root.getChildren().add(new Label(t.getStatementString()));
         }
     }
 
@@ -191,13 +202,9 @@ public class ExpenseTracker extends Application {
         ac.credit(enteredAmount);
         updateMessage(enteredAmount + " Credited Successfully");
         updateBalance();
-        if(amountTextField.getText() == null || amountTextField.getText().trim().isEmpty()){
-            transactions.add(new Transaction( "Credit", enteredAmount, "Nil", ac.getBalance() ) );
-        }
-        else{
-            transactions.add( new Transaction( "Credit", enteredAmount, remarksTextField.getText(), ac.getBalance() ) );
-        }
-        amountTextField.clear();
+        String remarks = remarksTextField.getText().trim().isEmpty() ? "Nil" : remarksTextField.getText();
+        transactions.add(new Transaction("Credit", enteredAmount, remarks, ac.getBalance()));
+        // amountTextField.clear();
     }
     
     private void handleDebit(TextField amountTextField, TextField remarksTextField) {
@@ -216,13 +223,9 @@ public class ExpenseTracker extends Application {
         if (ac.debit(enteredAmount)) {
             updateMessage(enteredAmount + " Debited Successfully");
             updateBalance();
-            if(amountTextField.getText() == null || amountTextField.getText().trim().isEmpty()){
-                transactions.add( new Transaction( "Debit", enteredAmount, "Nil", ac.getBalance() ) );
-            }
-            else{
-                transactions.add( new Transaction( "Debit", enteredAmount, remarksTextField.getText(), ac.getBalance() ) );
-            }
-            amountTextField.clear();
+            String remarks = remarksTextField.getText().trim().isEmpty() ? "Nil" : remarksTextField.getText();
+            transactions.add(new Transaction("Debit", enteredAmount, remarks, ac.getBalance()));
+            // amountTextField.clear();
         } else {
             updateMessage("Insufficient Balance");
         }
