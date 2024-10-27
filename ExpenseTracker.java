@@ -48,14 +48,14 @@ class Account{
 
 public class ExpenseTracker extends Application{
     Account ac = new Account();
-    Label operationStatus = new Label();
-    Label balaceView = new Label( "Balance = " + ac.getBalance() );
+    Label messageLabel = new Label();
+    Label balanceLabel = new Label( "Balance = " + ac.getBalance() );
 
-    public void updateStatus(String message){
-        operationStatus.setText("Status: "+message);
+    public void updateMessage(String message){
+        messageLabel.setText("Message: "+message);
     }
     public void updateBalace(){
-        balaceView.setText( "Balance = " + ac.getBalance() );
+        balanceLabel.setText( "Balance = " + ac.getBalance() );
     }
 
     public void start(Stage st){
@@ -77,11 +77,11 @@ public class ExpenseTracker extends Application{
                         throw new NumberFormatException();
                     }
                 } catch (Exception e) {
-                    updateStatus("Invalid Amount");
+                    updateMessage("Invalid Amount");
                     return;
                 }
                 ac.credit(enteredAmount);
-                updateStatus(enteredAmount+" Credited Succesfully");
+                updateMessage(enteredAmount+" Credited Succesfully");
                 updateBalace();
             }
         });
@@ -100,15 +100,15 @@ public class ExpenseTracker extends Application{
                         throw new NumberFormatException();
                     }
                 } catch (Exception e) {
-                    updateStatus("Invalid Amount");
+                    updateMessage("Invalid Amount");
                     return;
                 }
                 if(ac.debit(enteredAmount)){
-                    updateStatus(enteredAmount+" Debited Succesfully");
+                    updateMessage(enteredAmount+" Debited Succesfully");
                     updateBalace();
                 }
                 else{
-                    updateStatus("Insufficient Balance");
+                    updateMessage("Insufficient Balance");
                 }
             }
         });
@@ -116,9 +116,8 @@ public class ExpenseTracker extends Application{
         GridPane root = new GridPane();
         root.addRow(0,amountLabel, amountTextField);
         root.addRow(1,creditBtn,debitBtn);
-        root.addRow(2, operationStatus);
-        root.addRow(3, balaceView);
-        //root.addRow(1,pw,tf2);
+        root.addRow(2, messageLabel);
+        root.addRow(3, balanceLabel);
         Scene sc = new Scene(root, 500, 450);
         st.setScene(sc);
         st.show();
