@@ -27,3 +27,7 @@ replay_pid*
 *.ini
 *.exe
 *.out
+
+#reference file
+reference/
+test/
