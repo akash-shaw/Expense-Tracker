@@ -14,6 +14,7 @@ import javafx.geometry.Pos;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 import java.util.Collections;
+import javafx.scene.control.ScrollPane;
 
 class Account {
     private double balance;
@@ -161,7 +162,9 @@ public class ExpenseTracker extends Application {
         root2.setSpacing(10);
         VBox statements = new VBox();
         statements.setSpacing(5);
-        root2.getChildren().addAll(headingSc2, mainPageBtn, statements);
+        ScrollPane scroll = new ScrollPane();
+        scroll.setContent(statements);
+        root2.getChildren().addAll(headingSc2, mainPageBtn, scroll);
         root2.setPadding(new Insets(20));
 
         Scene sc2 = new Scene(root2, 500, 450);
