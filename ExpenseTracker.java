@@ -84,7 +84,7 @@ class Transaction {
     }
 
     public String getStatementString() {
-        return String.format("%s: %.2f\t on %s,\tBalance: %.2f,\tRemarks: %s", type, amount, date, currentBalance, remarks);
+        return String.format("%s: %.2f\t on %s,  Balance: %.2f,\tRemarks: %s", type, amount, date, currentBalance, remarks);
     }
 }
 
