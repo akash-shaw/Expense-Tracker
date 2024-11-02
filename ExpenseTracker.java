@@ -2,7 +2,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.text.NumberFormat;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.control.Button;
@@ -13,7 +12,6 @@ import javafx.scene.Scene;
 import javafx.geometry.Pos;
 import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
-import java.util.Collections;
 import javafx.scene.control.ScrollPane;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -40,7 +38,6 @@ class Account {
                 System.out.println("Error reading balance; initializing to 0.");
             }
         } else {
-            // If file doesn't exist, create it with a starting balance of 0
             balance = 0;
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(balanceFile))) {
                 bw.write(String.valueOf(balance));
@@ -52,10 +49,6 @@ class Account {
 
     public double getBalance() {
         return balance;
-    }
-
-    public void displayBalance() {
-        System.out.printf("Current Balance = %.2f", balance);
     }
 
     public boolean credit(double amount) {
@@ -92,22 +85,6 @@ class Transaction {
         updateTransactionToFile();
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public String getRemarks(){
-        return remarks;
-    }
-
     public String getStatementString() {
         return String.format("%s: %.2f\t on %s,  Balance: %.2f,\tRemarks: %s", type, amount, date, currentBalance, remarks);
     }
@@ -122,20 +99,19 @@ class Transaction {
 
     public void updateTransactionToFile(){
         String transactionString = getStatementString();
-        File transactionsFile = new File("transactions.txt");
+        File transactionsFile = new File("expenses.txt");
 
         try {
             if (!transactionsFile.exists()) {
-                // Create the file if it doesn't exist
                 transactionsFile.createNewFile();
             }
             // Append transaction to the file
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(transactionsFile, true))) {
                 bw.write(transactionString);
-                bw.newLine(); // Add a new line after each transaction
+                bw.newLine();
             }
         } catch (IOException e) {
-            System.out.println("Error writing to transactions file.");
+            System.out.println("Error writing to expenses file.");
             e.printStackTrace();
         }
     }
@@ -176,7 +152,7 @@ public class ExpenseTracker extends Application {
         Button debitBtn = new Button("Debit");
         debitBtn.setOnAction(e -> handleDebit(amountTextField, remarksTextField));
 
-        Button statementBtn = new Button("View Statement");
+        Button statementBtn = new Button("Your Expenses");
 
         GridPane gp1 = new GridPane();
         gp1.addRow(0, amountLabel, amountTextField);
@@ -231,7 +207,7 @@ public class ExpenseTracker extends Application {
         mainPageBtn.setOnAction(e -> switchScene(st, sc1));
 
         allExpensesBtn.setOnAction(e ->{
-            File file = new File("transactions.txt");
+            File file = new File("expenses.txt");
             if (file.exists()) {
                 try {
                     Desktop.getDesktop().open(file);
