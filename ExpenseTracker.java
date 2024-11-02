@@ -236,11 +236,11 @@ public class ExpenseTracker extends Application {
                 try {
                     Desktop.getDesktop().open(file);
                 } catch (IOException exp) {
-                    updateMessage("Error opening file.");
+                    System.out.println("Error opening file.");
                     exp.printStackTrace();
                 }
             } else {
-                updateMessage("File not found.");
+                System.out.println("File not found.");
             }
         });
 
