@@ -88,6 +88,7 @@ class Transaction {
         this.remarks = remarks;
         this.currentBalance = currentBalance;
         updateBalanceFile(ac);
+        updateTransactionToFile();
     }
 
     public String getType() {
@@ -114,6 +115,26 @@ class Transaction {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter("balance.txt"))) {
             bw.write(String.valueOf(ac.getBalance()));
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateTransactionToFile(){
+        String transactionString = getStatementString();
+        File transactionsFile = new File("transactions.txt");
+
+        try {
+            if (!transactionsFile.exists()) {
+                // Create the file if it doesn't exist
+                transactionsFile.createNewFile();
+            }
+            // Append transaction to the file
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(transactionsFile, true))) {
+                bw.write(transactionString);
+                bw.newLine(); // Add a new line after each transaction
+            }
+        } catch (IOException e) {
+            System.out.println("Error writing to transactions file.");
             e.printStackTrace();
         }
     }
