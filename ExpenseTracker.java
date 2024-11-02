@@ -15,16 +15,38 @@ import javafx.scene.layout.VBox;
 import javafx.geometry.Insets;
 import java.util.Collections;
 import javafx.scene.control.ScrollPane;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.File;
 
 class Account {
     private double balance;
 
     Account() {
-        balance = 0;
-    }
-
-    Account(double amount) {
-        balance = amount;
+        File balanceFile = new File("balance.txt");
+        
+        if (balanceFile.exists()) {
+            try (BufferedReader br = new BufferedReader(new FileReader(balanceFile))) {
+                String line = br.readLine();
+                if (line != null) {
+                    balance = Double.parseDouble(line);
+                }
+            } catch (IOException | NumberFormatException e) {
+                balance = 0;
+                System.out.println("Error reading balance; initializing to 0.");
+            }
+        } else {
+            // If file doesn't exist, create it with a starting balance of 0
+            balance = 0;
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(balanceFile))) {
+                bw.write(String.valueOf(balance));
+            } catch (IOException e) {
+                System.out.println("Error creating balance file.");
+            }
+        }
     }
 
     public double getBalance() {
@@ -58,13 +80,14 @@ class Transaction {
     private String remarks;
     private double currentBalance;
 
-    public Transaction(String type, double amount, String remarks, double currentBalance) {
+    public Transaction(Account ac, String type, double amount, String remarks, double currentBalance) {
         this.type = type;
         this.amount = amount;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         this.date = LocalDateTime.now().format(formatter);
         this.remarks = remarks;
         this.currentBalance = currentBalance;
+        updateBalanceFile(ac);
     }
 
     public String getType() {
@@ -85,6 +108,14 @@ class Transaction {
 
     public String getStatementString() {
         return String.format("%s: %.2f\t on %s,  Balance: %.2f,\tRemarks: %s", type, amount, date, currentBalance, remarks);
+    }
+
+    public void updateBalanceFile(Account ac) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("balance.txt"))) {
+            bw.write(String.valueOf(ac.getBalance()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 
@@ -206,7 +237,7 @@ public class ExpenseTracker extends Application {
         updateMessage(enteredAmount + " Credited Successfully");
         updateBalance();
         String remarks = remarksTextField.getText().trim().isEmpty() ? "Nil" : remarksTextField.getText();
-        transactions.add(new Transaction("Credit", enteredAmount, remarks, ac.getBalance()));
+        transactions.add(new Transaction(ac, "Credit", enteredAmount, remarks, ac.getBalance()));
         // amountTextField.clear();
     }
     
@@ -227,7 +258,7 @@ public class ExpenseTracker extends Application {
             updateMessage(enteredAmount + " Debited Successfully");
             updateBalance();
             String remarks = remarksTextField.getText().trim().isEmpty() ? "Nil" : remarksTextField.getText();
-            transactions.add(new Transaction("Debit", enteredAmount, remarks, ac.getBalance()));
+            transactions.add(new Transaction(ac, "Debit", enteredAmount, remarks, ac.getBalance()));
             // amountTextField.clear();
         } else {
             updateMessage("Insufficient Balance");
