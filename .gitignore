@@ -31,3 +31,7 @@ replay_pid*
 #reference file
 reference/
 test/
+
+# program files
+balance.txt
+transactions.txt
