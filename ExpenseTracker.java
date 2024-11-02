@@ -21,6 +21,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.File;
+import java.awt.Desktop;
 
 class Account {
     private double balance;
@@ -209,6 +210,7 @@ public class ExpenseTracker extends Application {
         headingSc2.setStyle("-fx-font-weight: bold; -fx-font-size: 24px;");
 
         Button mainPageBtn = new Button("Back to Main Page");
+        Button allExpensesBtn = new Button("All Expenses");
 
         VBox root2 = new VBox();
         root2.setSpacing(10);
@@ -216,7 +218,7 @@ public class ExpenseTracker extends Application {
         statements.setSpacing(5);
         ScrollPane scroll = new ScrollPane();
         scroll.setContent(statements);
-        root2.getChildren().addAll(headingSc2, mainPageBtn, scroll);
+        root2.getChildren().addAll(headingSc2, mainPageBtn, allExpensesBtn, scroll);
         root2.setPadding(new Insets(20));
 
         Scene sc2 = new Scene(root2, 500, 450);
@@ -228,6 +230,19 @@ public class ExpenseTracker extends Application {
         });
         mainPageBtn.setOnAction(e -> switchScene(st, sc1));
 
+        allExpensesBtn.setOnAction(e ->{
+            File file = new File("transactions.txt");
+            if (file.exists()) {
+                try {
+                    Desktop.getDesktop().open(file);
+                } catch (IOException exp) {
+                    updateMessage("Error opening file.");
+                    exp.printStackTrace();
+                }
+            } else {
+                updateMessage("File not found.");
+            }
+        });
 
         st.setScene(sc1);
         st.show();
